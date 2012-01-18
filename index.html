@@ -50,60 +50,61 @@
 
   <div id="container">
     <header>
-    	<h1 class="logo"> Jake heart's Pony Chat </h1>
-
+    	<div class="content">
+        	<h1 class="logo"> Jake heart's Pony Chat </h1>
+        </div>
     </header>
+    <div id="main" role="main" class="content">
     
+   		 <div id="joinWidget" >
+            <p>Please enter your name</p>
+            <input type="submit" value="Submit" onclick="identify(document.getElementById(&quot;nameInput&quot;).value);">
+            
+             <p class="hidden">
+                Whoaaaa pony! 
+                USER, is logging in. 
+            </p>
+        </div>
+    
+      
+    
+    	<div >
+        	<h3>Pony Chat Pals</h3>
+            <div id="userlist">
+            	
+            </div>
+        </div>
    
+        
+        <h2>Pony Chat Rocks</h2>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus in nisi non est faucibus vestibulum ac ac nunc. Quisque a sem orci, sed iaculis lacus. Phasellus vestibulum venenatis dui. Vestibulum rutrum elit diam, dictum mollis velit. Maecenas ultricies aliquam elit, at molestie nisl cursus nec. Sed tincidunt scelerisque mauris, ac venenatis augue fringilla eu. In molestie justo in odio fermentum at elementum nulla lobortis.
+        </p>
+        <p>
+            Phasellus laoreet ultricies leo eu accumsan. Cras sed sapien dolor, quis iaculis eros. In lacinia velit ac turpis eleifend eget vestibulum felis imperdiet. Nullam sed purus ut felis vulputate malesuada eget et enim. Vivamus egestas commodo malesuada. Nulla ultrices lacinia massa non pellentesque. Etiam commodo elementum odio, ac rutrum ipsum euismod at. Sed consequat leo sed sapien ornare faucibus. Nulla nec felis magna. Nullam adipiscing, sapien lobortis condimentum pharetra, eros metus eleifend orci, non luctus magna odio quis nulla.
+        </p>
     
-    <h2>Pony Chat Rocks</h2>
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus in nisi non est faucibus vestibulum ac ac nunc. Quisque a sem orci, sed iaculis lacus. Phasellus vestibulum venenatis dui. Vestibulum rutrum elit diam, dictum mollis velit. Maecenas ultricies aliquam elit, at molestie nisl cursus nec. Sed tincidunt scelerisque mauris, ac venenatis augue fringilla eu. In molestie justo in odio fermentum at elementum nulla lobortis.
-    </p>
-    <p>
-        Phasellus laoreet ultricies leo eu accumsan. Cras sed sapien dolor, quis iaculis eros. In lacinia velit ac turpis eleifend eget vestibulum felis imperdiet. Nullam sed purus ut felis vulputate malesuada eget et enim. Vivamus egestas commodo malesuada. Nulla ultrices lacinia massa non pellentesque. Etiam commodo elementum odio, ac rutrum ipsum euismod at. Sed consequat leo sed sapien ornare faucibus. Nulla nec felis magna. Nullam adipiscing, sapien lobortis condimentum pharetra, eros metus eleifend orci, non luctus magna odio quis nulla.
-    </p>
-
-    
-    
-     <p>List of Users online</p>
-    <div id="userList">
-    
-    </div>
-    
-    <div id="main" role="main">
-    	<h3 class="logo"> Jake heart's Pony Chat </h3>
+        
+        
+      
        
-    	<form action="" >
-            <div id="login">
-            	<p>Please enter your name</p>
-                
-                <p class="hidden">
-                	Whoaaaa pony! 
-                    USER, is logging in. 
-            	</p>
-            </div>
-        
-        
-            <div id="chatWindow" class="hidden">
-
-                <!--
-                
-                Chat Window
-                
-                
-                
-                -->
-            </div>
-            <label for="chatInput">
-                <input type="text" name="chatInput" id="chatInput" />
-                <span class="hearts">Go </span>
-            </label>
-     
-      </form>
-        
-
-    </div>
-
+      <div class="chatWindows" id="chat_          ">
+            <h3 class="logo"> Jake heart's Pony Chat </h3>
+           
+            <form action="" >           
+            
+                <div id="messages_         " class="messages" class="hidden">
+    
+                </div>
+                <label for="chatInput">
+                    <input type="text" name="chatInput" id="input_       " class="chatInput" onKeyPress="if(window.event.keyCode == 13) sendMessage(this.value());"/>                   
+                    <span class="hearts" onclick="sendMessage("todd", document.getElementById("input_       ").value)">Go </span>
+                </label>
+         
+          </form>
+            
+    
+        </div>
+	<div>
     <footer>
 
     </footer>
