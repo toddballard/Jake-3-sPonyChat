@@ -217,17 +217,15 @@ td { vertical-align: top; }
 	color: #FDA0BF;	
 	padding: 31px;
 	border-radius: 35px;
+	float: right;
+	width: 240px;
 }
-.#joinWidget, .messages{
+ .messages{
 	width: 220px;
-	height: 286px;
+	height: 223px;
 	background:#666666;
 	padding: 12px;
 	margin: 10px 0;
-	color: #fff;
-}
-.messages{
-	background: #fff;
 	color: #000;
 }
 .chatInput{
@@ -254,17 +252,23 @@ td { vertical-align: top; }
 		text-indent: -999em;
 		float:right;
 }
-
-
-
-
-
-
-
+#intro{
+	font-size: 18px;
+	padding: 2em 0 .5em 0;
+}
 
 #userlist{
   	background: #FF99CC;
+	border: 1px solid #000;
+	padding: 1em;
+	margin-right: 1em;
+	overflow:auto;
+	float: left;
   }
+  #userlist a{
+  	color: #000; 
+	font-size: 18px;
+	}
 
 
 
@@ -296,6 +300,8 @@ td { vertical-align: top; }
   #userlist{
 	  height: 350px;
   	overflow: auto;
+	width: 300px;
+	
   }
   
 }/*/mediaquery*/

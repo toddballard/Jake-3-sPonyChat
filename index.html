@@ -1,135 +1,155 @@
-<!doctype html>
-<!-- Conditional comment for mobile ie7 http://blogs.msdn.com/b/iemobile/ -->
-<!--[if IEMobile 7 ]>    <html class="no-js iem7"> <![endif]-->
-<!--[if (gt IEMobile 7)|!(IEMobile)]><!--> <html class="no-js"> <!--<![endif]-->
+<!-- Main Stylesheet -->
+<link rel="stylesheet" href="/css/style.css?v=1">
 
-<head>
-  <meta charset="utf-8">
+<script src="/socket.io/socket.io.js"></script>
+<script type="text/javascript">
+  var myName = '';
 
-  <title>Jake <3's Pony Chat</title>
-  <meta name="description" content="">
-  <meta name="author" content="">
+  var socket = io.connect('http://192.168.0.111:8000');
+  //var socket = io.connect('http://192.168.2.11:8000');
+  
+  socket.on('userlist', function(data){
+	var errorMessage = document.getElementById('errorMessage');
+	errorMessage.innerHTML = '';
+	
+	var joinWidget = document.getElementById('joinWidget');
+	joinWidget.setAttribute("class", "hidden");
+	//joinWidget.style.visibility = 'hidden';
+	
+	var introDiv = document.getElementById('intro');
+	introDiv.innerHTML = 'You have joined, <b>' + myName + '</b>. What a stupid name that is.';
+	
+	for (var x = 0; x < data.length; x++){
+		addListDiv(data[x]);
+	}
+  });
+  socket.on('clientconnecting', function(data){
+	addListDiv(data);
+  });
+  socket.on('username fail', function(data){
+	myName = '';
+	var errorMessage = document.getElementById('errorMessage');
+	errorMessage.innerHTML = data.message;
+  });
+  socket.on('prepare conversation', function(data){
+	var messageWindow = document.getElementById('messages_' + data.recipient);
+	if (messageWindow) {
+		for (x = 0; x < data.conversation.length; x++){
+			messageWindow.innerHTML += data.conversation[x].username + ': ' + data.conversation[x].message + '<br />';
+		}
+	}
+  });
+  socket.on('incoming message', function(data){
+	var messageWindow = document.getElementById('messages_' + data.sender);
+	if (messageWindow){
+		messageWindow.innerHTML += data.sender + ': ' + data.message + '<br />';
+	}
+	else {
+		openChat(data.sender);
+	}
+  });
+  socket.on('my message', function(data){
+	var messageWindow = document.getElementById('messages_' + data.recipient);
+	if (messageWindow){
+		messageWindow.innerHTML += myName + ': ' + data.message + '<br />';
+	}
+  });
+  socket.on('message send fail', function(data){
+	var messageWindow = document.getElementById('messages_' + data.recipient);
+	if (messageWindow){
+		messageWindow.innerHTML += 'System Message: ' + data.message + '<br />';
+	}
+  });
+  socket.on('clientdisconnecting', function(data){
+	var userlist = document.getElementById('userlist');
+	var removeName = document.getElementById('user_' + data.username);
+	
+	var messageWindow = document.getElementById('messages_' + data.username);
+	if(messageWindow){
+		messageWindow.innerHTML += data.username + ' has disconnected.<br />';
+	}
+	
+	userlist.removeChild(removeName);
+  });
+  
+  function addListDiv(data){
+	var userlist = document.getElementById('userlist');
+	var currentDiv = document.createElement('div');
+	currentDiv.id = 'user_' + data.username;
+	var currentLink = document.createElement('a');
+	currentLink.setAttribute('onclick', 'openChat("'+data.username+'")');
+	currentLink.setAttribute('href', '#');
+	currentLink.innerHTML = data.username;
+	currentDiv.appendChild(currentLink);
+	userlist.appendChild(currentDiv);
+  }
+  
+  function createChatWindow(recipient) {
+	var chatWindowArea = document.getElementById('chatwindows');
+	var chatDiv = document.createElement('div');
+	chatDiv.id = 'chat_' + recipient;
+	chatDiv.setAttribute("class", "chatWindows");
+	var logoElement = document.createElement('h3');
+	logoElement.setAttribute("class", "logo");
+	logoElement.innerHTML = "Jake heart's Pony Chat";
+	var messagesDiv = document.createElement('div');
+	messagesDiv.id = 'messages_' + recipient;
+	messagesDiv.setAttribute("class", "messages");
+	var inputDiv = document.createElement('div');
+	var textInput = document.createElement('input');
+	textInput.id = 'input_' + recipient;
+	textInput.setAttribute("type", "text");
+	textInput.setAttribute("class", "chatInput");
+	textInput.setAttribute("onKeyPress", 'if(window.event.keyCode == 13) sendMessage("'+ recipient +'", this.value);')
+	var buttonInput = document.createElement('span');
+	buttonInput.setAttribute("class", "hearts");
+	buttonInput.innerHTML = 'Go';
+	buttonInput.setAttribute("onclick", 'sendMessage("'+ recipient +'", document.getElementById("input_'+ recipient +'").value)');
+	
+	chatWindowArea.appendChild(chatDiv);
+	chatDiv.appendChild(logoElement);
+	chatDiv.appendChild(messagesDiv);
+	chatDiv.appendChild(inputDiv);
+	inputDiv.appendChild(textInput);
+	inputDiv.appendChild(buttonInput);
+  }
+  
+  function identify(username) {
+	myName = username;
+	socket.emit('identification', {username: username});
+  }
+  
+  function openChat(recipient) {
+    if (document.getElementById('chat_' + recipient))
+		return;
+	socket.emit('open chat', {sender: myName, recipient: recipient});
+	createChatWindow(recipient);
+  }
+  
+  function sendMessage(recipient, message) {
+	document.getElementById('input_'+recipient).value = "";
+	socket.emit('send message', {sender: myName, recipient: recipient, message: message});
+  }
+  
+  
+</script>
+<header>
+	<div class="content">
+		<h1 class="logo"> Jake heart's Pony Chat </h1>
+	</div>
+</header>
 
-  <!-- Mobile viewport optimization http://goo.gl/b9SaQ -->
-  <meta name="HandheldFriendly" content="True">
-  <meta name="MobileOptimized" content="320">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<div id="main" role="main" class="content">
 
-  <!-- Home screen icon  Mathias Bynens http://goo.gl/6nVq0 -->
-  <!-- For iPhone 4 with high-resolution Retina display: -->
-  <link rel="apple-touch-icon-precomposed" sizes="114x114" href="img/h/apple-touch-icon.png">
-  <!-- For first-generation iPad: -->
-  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="img/m/apple-touch-icon.png">
-  <!-- For non-Retina iPhone, iPod Touch, and Android 2.1+ devices: -->
-  <link rel="apple-touch-icon-precomposed" href="img/l/apple-touch-icon-precomposed.png">
-  <!-- For nokia devices: -->
-  <link rel="shortcut icon" href="img/l/apple-touch-icon.png">
+	<div id="intro">Type in your stupid name to start!!!</div>
+	<div id="joinWidget">
+	Enter Your Name: <input type="text" id="nameInput" value="" onKeyPress='if(window.event.keyCode == 13) identify(this.value);'/>
+	<input type="submit" value="Submit" onclick='identify(document.getElementById("nameInput").value);' />
+	</div>
+	<div id="errorMessage"></div>
+	
+    <p><div id="userlist"></div>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque a nulla felis. Aliquam diam diam, rhoncus non tincidunt quis, pellentesque ut nisl. Sed feugiat condimentum nunc. Nunc non lorem urna. Pellentesque sed metus nisi, eu pulvinar ipsum. Aenean tempor tellus vel eros fermentum ac tempus ligula ornare. Aliquam erat volutpat. Nunc lacinia, tellus ut posuere faucibus, nisl ante auctor est, vitae tincidunt mi diam at orci. Morbi malesuada, velit quis dictum varius, massa velit feugiat turpis, vitae sagittis eros tellus vel neque. Vestibulum porttitor imperdiet molestie. Integer laoreet orci a augue fermentum semper condimentum ante cursus. Praesent adipiscing lacus at metus consectetur sed euismod enim accumsan. In consectetur volutpat libero a interdum. Phasellus vel lorem libero, at ullamcorper augue.</p>
+	<div id="chatwindows"></div>
 
-  <!--iOS web app, deletable if not needed -->
-  <!--the script prevents links from opening in mobile safari. https://gist.github.com/1042026
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <script>(function(a,b,c){if(c in b&&b[c]){var d,e=a.location,f=/^(a|html)$/i;a.addEventListener("click",function(a){d=a.target;while(!f.test(d.nodeName))d=d.parentNode;"href"in d&&(d.href.indexOf("http")||~d.href.indexOf(e.host))&&(a.preventDefault(),e.href=d.href)},!1)}})(document,window.navigator,"standalone")</script>
-  <link rel="apple-touch-startup-image" href="img/l/splash.png">-->
+</div>
 
-  <!-- Mobile IE allows us to activate ClearType technology for smoothing fonts for easy reading -->
-  <meta http-equiv="cleartype" content="on">
-
-  <!-- more tags for your 'head' to consider https://gist.github.com/849231 -->
-
-  <!-- Main Stylesheet -->
-  <link rel="stylesheet" href="css/style.css?v=1">
-
-  <!-- All JavaScript at the bottom, except for Modernizr which enables HTML5 elements & feature detects -->
-  <script src="js/libs/modernizr-custom.js"></script>
-  <!-- Media Queries Polyfill https://github.com/shichuan/mobile-html5-boilerplate/wiki/Media-Queries-Polyfill -->
-  <script>Modernizr.mq('(min-width:0)') || document.write('<script src="js/libs/respond.min.js">\x3C/script>')</script>
-</head>
-
-<body>
-
-  <div id="container">
-    <header>
-    	<div class="content">
-        	<h1 class="logo"> Jake heart's Pony Chat </h1>
-        </div>
-    </header>
-    <div id="main" role="main" class="content">
-    
-   		 <div id="joinWidget" >
-            <p>Please enter your name</p>
-            <input type="submit" value="Submit" onclick="identify(document.getElementById(&quot;nameInput&quot;).value);">
-            
-             <p class="hidden">
-                Whoaaaa pony! 
-                USER, is logging in. 
-            </p>
-        </div>
-    
-      
-    
-    	<div >
-        	<h3>Pony Chat Pals</h3>
-            <div id="userlist">
-            	
-            </div>
-        </div>
-   
-        
-        <h2>Pony Chat Rocks</h2>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus in nisi non est faucibus vestibulum ac ac nunc. Quisque a sem orci, sed iaculis lacus. Phasellus vestibulum venenatis dui. Vestibulum rutrum elit diam, dictum mollis velit. Maecenas ultricies aliquam elit, at molestie nisl cursus nec. Sed tincidunt scelerisque mauris, ac venenatis augue fringilla eu. In molestie justo in odio fermentum at elementum nulla lobortis.
-        </p>
-        <p>
-            Phasellus laoreet ultricies leo eu accumsan. Cras sed sapien dolor, quis iaculis eros. In lacinia velit ac turpis eleifend eget vestibulum felis imperdiet. Nullam sed purus ut felis vulputate malesuada eget et enim. Vivamus egestas commodo malesuada. Nulla ultrices lacinia massa non pellentesque. Etiam commodo elementum odio, ac rutrum ipsum euismod at. Sed consequat leo sed sapien ornare faucibus. Nulla nec felis magna. Nullam adipiscing, sapien lobortis condimentum pharetra, eros metus eleifend orci, non luctus magna odio quis nulla.
-        </p>
-    
-        
-        
-      
-       
-      <div class="chatWindows" id="chat_          ">
-            <h3 class="logo"> Jake heart's Pony Chat </h3>
-           
-            <form action="" >           
-            
-                <div id="messages_         " class="messages" class="hidden">
-    
-                </div>
-                <label for="chatInput">
-                    <input type="text" name="chatInput" id="input_       " class="chatInput" onKeyPress="if(window.event.keyCode == 13) sendMessage(this.value());"/>                   
-                    <span class="hearts" onclick="sendMessage("todd", document.getElementById("input_       ").value)">Go </span>
-                </label>
-         
-          </form>
-            
-    
-        </div>
-	<div>
-    <footer>
-
-    </footer>
-  </div> <!--! end of #container -->
-
-
-  <!-- JavaScript at the bottom for fast page loading -->
-
-  <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if necessary -->
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-  <script>window.jQuery || document.write('<script src="js/libs/jquery-1.6.2.min.js"><\/script>')</script>
-
-  <!-- scripts concatenated and minified via ant build script -->
-  <script src="js/mylibs/helper.js"></script>
-  <!-- end concatenated and minified scripts-->
-
-  <script>
-    // iPhone Scale Bug Fix, read this when using http://www.blog.highub.com/mobile-2/a-fix-for-iphone-viewport-scale-bug/
-    MBP.scaleFix();
-  </script>
-
-  <!-- Debugger - remove for production -->
-  <!-- <script src="https://getfirebug.com/firebug-lite.js"></script> -->
-
-
-
-</body>
-</html>
